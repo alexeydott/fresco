@@ -1,5 +1,7 @@
 const localStoragePath = 'frescoStylesStore'
 
+const defaultGlyphsUrl = 'https://go-spatial.github.io/carto-assets/fonts/{fontstack}/{range}.pbf'
+
 const defaultLayers = [
 	{
 		"id": "background",
@@ -18,6 +20,7 @@ const defaultLayers = [
 const defaultMapboxVersion = 8
 
 export default {
+	defaultGlyphsUrl,
 	defaultLayers,
 	defaultMapboxVersion,
 	localStoragePath,

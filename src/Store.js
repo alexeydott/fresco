@@ -4,6 +4,7 @@ import {reducer as app} from './model/app/reducer'
 import {reducer as map} from './model/map/reducer'
 import {reducer as preference} from './model/preference/reducer'
 import {reducer as source} from './model/source/reducer'
+import {reducer as tegola} from './model/tegola/reducer'
 import {reducer as style} from './model/style/reducer'
 
 export const reducers = combineReducers({
@@ -11,6 +12,7 @@ export const reducers = combineReducers({
 	map,
 	preference,
 	source,
+	tegola,
 	style,
 })
 

@@ -33,12 +33,13 @@ const add = async ({makeLayers, name, source, sourceType})=>{
 		if (makeLayers){
 			const sourceData = await actions.act('source.pullData', {url: source})
 			const layers = await actions.act('source.makeLayersFromData', {sourceId, sourceData})
-			style.layers = layers
+			style.layers = constants.defaultLayers.concat(layers)
 		}
 	} else {
 		style.sources = {}
 	}
-	style.layers = constants.defaultLayers
+	if (!style.layers) style.layers = constants.defaultLayers
+	if (!style.glyphs) style.glyphs = constants.defaultGlyphsUrl
 
 	const styleImm = fromJS(style)
 	const stylePath = [style.id, 'current']
@@ -68,6 +69,7 @@ const addFromJson = async ({json})=>{
 	//TODO check if ID is unique
 	style.id = utilUid.make()
 	style.version = json.get('version') || constants.defaultMapboxVersion
+	if (!style.glyphs) style.glyphs = constants.defaultGlyphsUrl
 
 	const styleImm = fromJS(style)
 	const stylePath = [style.id, 'current']
@@ -417,6 +419,7 @@ const updateUpload = async ({file, style})=>{
 }
 
 actions.subscribe('style',{
+	addFromJson,
 	changeKeyIn,
 	listAdd,
 	listAddAt,

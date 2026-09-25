@@ -39,7 +39,7 @@ class FieldColor extends React.Component {
 		handle.blur && handle.blur(e.target.name)
 	}
 
-	handleKeyup = (e)=>{
+	handleKeyUp = (e)=>{
 		const {handle} = this.props
 
 		if (e.key === 'Enter'){

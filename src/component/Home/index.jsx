@@ -80,6 +80,10 @@ class Home extends React.Component {
 					<Icon icon={'style'}/>
 					<Infotip direction={'y'} message={'styles'}/>
 				</NavLink>
+				<NavLink to={'/tegola'} className={'content-title-option infotip-trigger interactive'}>
+					<Icon icon={'styles'}/>
+					<Infotip direction={'y'} message={'tegola'}/>
+				</NavLink>
 			</div>
 		)
 	}

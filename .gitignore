@@ -19,3 +19,15 @@
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+
+# session / agent state (never push)
+.opencode/
+
+# local verification harness (machine-specific)
+/e2e
+
+# build artifacts / release binaries
+/releases
+*.exe
+*.zip
+

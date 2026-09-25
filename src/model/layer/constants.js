@@ -100,6 +100,18 @@ const layerTypes = {
 			}
 		}
 	},
+	"raster-dem":{
+		"label":"raster-dem",
+		"icon":"terrain",
+		"default":{
+			"layout":{
+				"visibility":"visible"
+			},
+			"paint":{
+				"hillshade-exaggeration":0.5
+			}
+		}
+	},
 	"symbol":{
 		"label":"symbol",
 		"icon":"text_format",

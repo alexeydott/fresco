@@ -11,6 +11,7 @@ import MapboxGl from 'mapbox-gl'
 import 'mapbox-gl/dist/mapbox-gl.css'
 
 import constants from './constants'
+import utilStyleDiff from '../../utility/utilStyleDiff'
 import utilUrl from '../../utility/utilUrl'
 
 import Dropdown from '../Dropdown'
@@ -96,14 +97,23 @@ class MapMapbox extends React.Component {
 			})
 		}
 
-		const map = new MapboxGl.Map({
+		const styleJs = style.toJS()
+		const mapOptions = {
 			attributionControl:false,
 			logoPosition:'bottom-right',
 			container: this.container,
-			style: style.toJS(),
+			style: styleJs,
 			transformRequest: this.transformRequest,
 			hash:true
-		})
+		}
+
+		// mapbox-gl sets the initial camera from Map options, not from the
+		// style's top-level center/zoom — so apply them explicitly, otherwise
+		// the map opens at the default [0,0] view regardless of the style.
+		if (styleJs.center) mapOptions.center = styleJs.center
+		if (typeof styleJs.zoom === 'number') mapOptions.zoom = styleJs.zoom
+
+		const map = new MapboxGl.Map(mapOptions)
 
 		const Controls = new CustomControls({})
 		Controls.handleLocationToggle = this.handleLocationToggle
@@ -193,9 +203,10 @@ class MapMapbox extends React.Component {
 		}
 
 		if (!this.style || !this.style.equals(style)){
+			const prevStyle = this.style
 			this.style = style
-			
-			this.reStyleMap()
+
+			this.reStyleMap(prevStyle)
 		}
 
 		this.applyFeatureStates()
@@ -299,14 +310,21 @@ class MapMapbox extends React.Component {
 		this.buildMap()
 	}
 
-	reStyleMap (){
+	reStyleMap (prevStyle){
 		const {style} = this.props
-	
+
 		modelStyle.actions.errorClear({
 			path: [style.getIn(['id'])],
 		})
+
+		if (!this.map) return
+
+		// apply incremental style edits so changes show up on the map
+		// immediately; fall back to a full restyle for structural changes
+		if (prevStyle && utilStyleDiff.apply(this.map, prevStyle.toJS(), style.toJS())) return
+
 		try {
-			this.map && this.map.setStyle(style.toJS(),{diff: true})
+			this.map.setStyle(style.toJS(),{diff: true})
 		} catch(e){
 			this.handleMapError(e)
 		}

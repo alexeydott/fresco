@@ -125,11 +125,11 @@ const getGroupSpec = ({group, layer})=>{
 
 const getRootPropertyFields = ({layer})=>{
 	if (getLayerType({layer}) === 'background'){
-		return ['id', 'type']
+		return ['id', 'type', 'ref', 'metadata']
 	} else if (layer.has('source')){
-		return ['id', 'type', 'source', 'source-layer', 'filter', 'maxzoom', 'minzoom']
+		return ['id', 'type', 'source', 'source-layer', 'ref', 'filter', 'metadata', 'maxzoom', 'minzoom']
 	} else {
-		return ['id', 'type', 'source', 'filter', 'maxzoom', 'minzoom']
+		return ['id', 'type', 'source', 'ref', 'filter', 'metadata', 'maxzoom', 'minzoom']
 	}
 }
 
@@ -183,6 +183,7 @@ const getStyleRootPropertyFields = ()=>{
 		'pitch',
 		'light',
 		'sprite',
+		'sprites',
 		'glyphs',
 		'transition',
 		'metadata',

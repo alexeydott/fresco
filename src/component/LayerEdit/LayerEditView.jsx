@@ -2,6 +2,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 
 import LayerEditGroup from './LayerEditGroup'
+import LayerEditPreview from './LayerEditPreview'
 import modelPreference from '../../model/preference'
 
 class LayerEditView extends React.Component {
@@ -19,6 +20,7 @@ class LayerEditView extends React.Component {
 
 		return (
 			<div className="content-body">
+				<LayerEditPreview layer={layer}/>
 				<LayerEditGroup 
 					error={error}  
 					group="root"

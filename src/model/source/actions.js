@@ -105,26 +105,32 @@ const makeLayersFromData = async ({sourceId, sourceData})=>{
 	const sourceLayers = helpers.getLayersFromData({data: sourceData})
 
 	sourceLayers.forEach((sourceLayer)=>{
-		const color = utilMaterialColor.getBright(sourceLayer.get('id'))
+		const sourceLayerId = sourceLayer.get('id')
+		const sourceLayerName = sourceLayer.get('name') || sourceLayerId
+		const color = utilMaterialColor.getBright(sourceLayerId)
+		const minzoom = sourceLayer.get('minzoom') || constants.defaultMinZoom
+		const maxzoom = sourceLayer.get('maxzoom') || constants.defaultMaxZoom
+		const geometryType = sourceLayer.get('geometry_type')
 
+		// --- base geometry layer ---
 		let layer = {
-			id: sourceLayer.get('id'),
+			id: sourceLayerId,
 			source: sourceId,
-			'source-layer': sourceLayer.get('name') || sourceLayer.get('id'),
+			'source-layer': sourceLayerName,
 			layout: {
 				visibility: 'visible'
 			},
-			'minzoom': sourceLayer.get('minzoom') || constants.defaultMinZoom,
-			'maxzoom': sourceLayer.get('maxzoom') || constants.defaultMaxZoom,
+			'minzoom': minzoom,
+			'maxzoom': maxzoom,
 		}
 
-		if (sourceLayer.get('geometry_type') === 'point'){
+		if (geometryType === 'point'){
 			layer.type = 'circle'
 			layer.paint = {
 				'circle-radius': 3,
 				'circle-color': color
 			}
-		} else if (sourceLayer.get('geometry_type') === 'line'){
+		} else if (geometryType === 'line'){
 			layer.type = 'line'
 			layer.paint = {
 				'line-color': color
@@ -136,9 +142,48 @@ const makeLayersFromData = async ({sourceId, sourceData})=>{
 				'fill-opacity': 0.2
 			}
 		}
-		if (!layer.type) return null
+		if (!layer.type) return
 
 		layers.push(layer)
+
+		// --- label (symbol) layer for text ---
+		// Use a coalesce chain over the common attribute names so labels render
+		// across both OSM-style (`name`) and tegola/egko-style sources where the
+		// display attribute is `caption` / `NAME` / `NAME_OBJ` / `street_name`
+		// / `region_name` / `district_name`. Coalesce returns the first non-null
+		// value; the trailing '' keeps the expression string-typed.
+		const textField = ['coalesce',
+			['get', 'caption'],
+			['get', 'name'],
+			['get', 'NAME'],
+			['get', 'NAME_OBJ'],
+			['get', 'street_name'],
+			['get', 'region_name'],
+			['get', 'district_name'],
+			'',
+		]
+
+		let labelLayer = {
+			id: `${sourceLayerId}-text`,
+			source: sourceId,
+			'source-layer': sourceLayerName,
+			type: 'symbol',
+			minzoom: minzoom,
+			maxzoom: maxzoom,
+			layout: {
+				'text-field': textField,
+				'text-font': ['Open Sans Regular'],
+				'text-size': 12,
+				'symbol-placement': geometryType === 'line' ? 'line' : 'point',
+			},
+			paint: {
+				'text-color': '#273237',
+				'text-halo-color': '#FFFFFF',
+				'text-halo-width': 1,
+			},
+		}
+
+		layers.push(labelLayer)
 	})
 
 	return layers
